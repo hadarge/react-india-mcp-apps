@@ -1,0 +1,11 @@
+node_modules/
+.dist/
+.e2e/
+.backups/
+.tsconfig.*.json
+.vite.*.mjs
+.DS_Store
+*.log
+.npm-cache/
+.dev-port
+host/dist/

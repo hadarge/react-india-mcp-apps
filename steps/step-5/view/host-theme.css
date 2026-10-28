@@ -1,0 +1,16 @@
+/* When the host sends its design tokens (Claude, ChatGPT, basic-host do), map
+   them onto the component's own variables. The component stays host-agnostic;
+   this file is the only place that knows the host's vocabulary. */
+:root[data-host-styles] .tb {
+  --tb-bg: var(--color-background-primary);
+  --tb-fg: var(--color-text-primary);
+  --tb-muted: var(--color-text-secondary);
+  --tb-border: var(--color-border-primary);
+  --tb-surface: var(--color-background-secondary);
+  --tb-font: var(--font-sans);
+  --tb-radius: var(--border-radius-lg, 14px);
+}
+/* No nested page scroll inside a chat; never size html/body to 100%. */
+html, body { margin: 0; background: transparent; overscroll-behavior: contain; }
+#root { padding: 2px; }
+.tb { max-width: none; }

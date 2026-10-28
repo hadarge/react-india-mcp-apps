@@ -1,0 +1,16 @@
+:root { color-scheme: light dark; --bg: #f6f3ee; --fg: #1d1a16; --muted: #6d665c; --card: #fff; --line: #e8e2d8; }
+@media (prefers-color-scheme: dark) { :root { --bg: #121110; --fg: #f3eee6; --muted: #a59d90; --card: #1b1916; --line: #35312b; } }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--fg); }
+.page { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; }
+@media (max-width: 860px) { .page { grid-template-columns: 1fr; } }
+.page h1 { margin: 0 0 4px; font-size: 26px; }
+.page .lede { margin: 0 0 20px; color: var(--muted); }
+.badge { display: inline-block; font: 600 11px/1 ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 6px; background: var(--fg); color: var(--bg); margin-bottom: 12px; }
+.log { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; max-height: 520px; overflow: auto; }
+.log h3 { margin: 0 0 8px; font: 600 12px ui-sans-serif, system-ui; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.log div { border-bottom: 1px dashed var(--line); padding: 6px 0; word-break: break-word; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.toolbar button { font: inherit; font-size: 13px; padding: 7px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--fg); cursor: pointer; }
+nav.pages { display: flex; gap: 14px; font-size: 14px; margin-bottom: 18px; }
+nav.pages a { color: inherit; }
