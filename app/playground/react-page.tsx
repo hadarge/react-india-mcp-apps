@@ -25,6 +25,7 @@ const Page = () => {
   return (
     <div className="page">
       <main>
+        <nav className="pages"><a href="./index.html">React app</a><a href="./vanilla.html">Vanilla host</a><a href="./react-host.html">React host via contract</a><a href="./vue.html">Vue host</a></nav>
         <span className="badge">consumer · React app</span>
         <h1>Book a table</h1>
         <p className="lede">The component as it lives today: imported into a React tree.</p>
