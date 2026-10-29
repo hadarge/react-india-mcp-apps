@@ -9,6 +9,8 @@ Each step below has the same four parts:
 
 **Explain it back.** Every step ends with three questions. When the step works, have your agent answer them in the chat, quoting the lines it wrote (`AGENTS.md` tells it to), then read the answers and push back. Knowing why a line is there is the part an agent can't do for you.
 
+**The guide:** `npm run dev` opens http://localhost:5173/guide in your browser. It walks you through every step with copy buttons and clickable checkpoint links, and shows which step your `app/` is at, which servers are up, and your tunnel URL in step 5.
+
 Fell behind? Stop `npm run dev` (Ctrl+C), run `npm run catchup <n>`, then `npm run dev` again. Catchup replaces `app/` with the finished step and backs up your version first. It takes under a minute.
 
 Using your own component instead of the provided one? See the section "Bring your own component" at the end.

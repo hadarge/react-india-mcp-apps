@@ -8,5 +8,7 @@ node_modules/
 *.log
 .npm-cache/
 .dev-port
+.tunnel-url
+.guide-opened
 .tools/
 host/dist/

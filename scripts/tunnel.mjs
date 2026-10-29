@@ -3,12 +3,14 @@
 // Default: Cloudflare quick tunnel (no account). Fallback: `ngrok http 3001`.
 // The URL changes on every restart: re-add the connector (or edit its URL) each time.
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 // Follows `npm run dev -- --port N` (dev writes .dev-port); PORT env or --port override it.
 const portArg = process.argv.indexOf("--port");
 const devPort = new URL("../.dev-port", import.meta.url);
+const tunnelFile = new URL("../.tunnel-url", import.meta.url);
+rmSync(tunnelFile, { force: true });
 const port = portArg > 0 ? process.argv[portArg + 1] : process.env.PORT ?? (existsSync(devPort) ? readFileSync(devPort, "utf8").trim() : "3001");
 const win = process.platform === "win32";
 // On Windows, npm's shims are .cmd files, which Node can only start through a shell.
@@ -40,6 +42,7 @@ const scan = (d) => {
   if (m && !shown) {
     shown = true;
     const url = `${m[0]}/mcp`;
+    writeFileSync(tunnelFile, url); // the guide page shows it
     console.log(`\n  Connector URL:  \x1b[1m${url}\x1b[0m\n`);
     console.log(`  Check it:       npm run check -- ${url}`);
     console.log(`  Claude:         Settings → Connectors → Add custom connector → paste the URL (no auth)`);
@@ -53,6 +56,7 @@ child.stderr.on("data", (d) => {
   if (/error|failed/i.test(String(d)) && !shown) process.stderr.write(d);
 });
 child.on("exit", (code) => {
+  rmSync(tunnelFile, { force: true });
   if (!shown) console.error(`\nTunnel did not start (exit ${code}). Fallback: install ngrok and run \`ngrok http ${port}\`, then use <https-url>/mcp.`);
   process.exit(code ?? 0);
 });

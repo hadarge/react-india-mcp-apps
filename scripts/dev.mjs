@@ -9,7 +9,7 @@
 //        npm run dev -- --step 3     (run a finished step without touching ./app)
 //        npm run dev -- --port 3011  (if 3001 is taken; works on Windows too)
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildHost } from "./build-host.mjs";
@@ -82,6 +82,8 @@ if (hasServer) {
   console.log(`  MCP server   http://localhost:${PORT}/mcp`);
   console.log(`  Local host   http://localhost:${process.env.HOST_PORT ?? 8080}        (pick a tool, press Call Tool)`);
 }
+const guideUrl = `http://localhost:${process.env.PLAYGROUND_PORT ?? 5173}/guide`;
+console.log(`  \x1b[1mGuide        ${guideUrl}\x1b[0m   (every step, with links)`);
 console.log("");
 
 run("play", bin("vite", "bin/vite.js"), ["--config", "vite.playground.config.ts"]);
@@ -90,6 +92,17 @@ if (hasServer) {
   buildHost({ quiet: true });
   run("mcp", bin("tsx", "dist/cli.mjs"), ["watch", "--clear-screen=false", path.join(appDir, "server", "main.ts")]);
   run("host", bin("tsx", "dist/cli.mjs"), ["host/serve.ts"]);
+}
+
+// Open the guide in the browser on the first run (and again after 6 hours), not on every restart.
+// Opt out: GUIDE=0 npm run dev. Never in CI.
+const openedFile = path.join(root, ".guide-opened");
+const recentlyOpened = existsSync(openedFile) && Date.now() - statSync(openedFile).mtimeMs < 6 * 3600_000;
+if (!process.env.CI && process.env.GUIDE !== "0" && !recentlyOpened) {
+  setTimeout(() => {
+    const [cmd, cmdArgs] = process.platform === "darwin" ? ["open", [guideUrl]] : process.platform === "win32" ? ["cmd", ["/c", "start", "", guideUrl]] : ["xdg-open", [guideUrl]];
+    try { spawn(cmd, cmdArgs, { stdio: "ignore", detached: true }).on("error", () => {}).unref(); writeFileSync(openedFile, guideUrl); } catch {}
+  }, 2500);
 }
 
 let stopping = false;

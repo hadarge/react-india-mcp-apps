@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workshop guide · Sunset Shack</title>
+<style>
+:root {
+  --bg: #fbf8f4; --card: #ffffff; --ink: #17150f; --muted: #5d5766; --line: #e7e0d6;
+  --purple: #6c18ff; --purple-soft: #f3eefb; --orange: #ff7133; --ok: #1f8a55; --off: #a29aac;
+  --code-bg: #1b1822; --code-ink: #ede7f6;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #141218; --card: #1e1b25; --ink: #f4f0fa; --muted: #b3abc0; --line: #2e2a38; --purple: #a98bff; --purple-soft: #241d33; --code-bg: #0f0d13; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+a { color: var(--purple); }
+code, .cmd { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; }
+header { padding: 32px 24px 16px; max-width: 980px; margin: 0 auto; }
+.eyebrow { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: var(--purple); }
+h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 38px; line-height: 1.1; margin: 6px 0 4px; }
+h1 span { color: var(--orange); }
+.sub { color: var(--muted); margin: 0; }
+.status { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 14px; text-decoration: none; color: var(--ink); }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--off); }
+.pill.on .dot { background: var(--ok); }
+main { max-width: 980px; margin: 0 auto; padding: 8px 24px 64px; }
+.tip { background: var(--purple-soft); border-radius: 14px; padding: 14px 18px; margin: 8px 0 20px; }
+.step { background: var(--card); border: 1px solid var(--line); border-radius: 18px; margin: 14px 0; overflow: hidden; }
+.step > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+.step > summary::-webkit-details-marker { display: none; }
+.num { flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-family: Georgia, serif; font-size: 20px; background: var(--purple-soft); color: var(--purple); }
+.step.done .num { background: var(--ok); color: #fff; }
+.step.current { border-color: var(--orange); box-shadow: 0 0 0 2px color-mix(in srgb, var(--orange) 35%, transparent); }
+.step.current .num { background: var(--orange); color: #17150f; }
+.title { font-weight: 650; font-size: 18px; }
+.tag { margin-left: auto; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.step.current .tag { color: var(--orange); }
+.body { padding: 0 20px 18px 72px; }
+.goal { color: var(--muted); margin: 0 0 12px; }
+.row { display: grid; grid-template-columns: 150px 1fr; gap: 6px 14px; margin: 10px 0; }
+.label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding-top: 7px; }
+.cmd { display: flex; align-items: center; gap: 10px; background: var(--code-bg); color: var(--code-ink); padding: 8px 8px 8px 14px; border-radius: 10px; margin: 0 0 6px; }
+.cmd span { flex: 1; overflow-x: auto; white-space: nowrap; }
+.cmd.say span { color: #ffb08c; font-size: 15px; }
+button.copy { flex: none; border: 0; border-radius: 7px; padding: 5px 10px; font: 600 12px ui-sans-serif, sans-serif; background: #2f2a3a; color: #ede7f6; cursor: pointer; }
+button.copy.ok { background: var(--ok); }
+ul { margin: 0; padding-left: 18px; }
+li { margin: 3px 0; }
+.links a { display: inline-block; margin: 0 8px 6px 0; padding: 6px 12px; border-radius: 9px; background: var(--purple-soft); text-decoration: none; font-weight: 600; font-size: 14px; }
+.small { font-size: 14px; color: var(--muted); }
+footer { max-width: 980px; margin: 0 auto; padding: 0 24px 48px; color: var(--muted); font-size: 14px; }
+@media (max-width: 640px) { .body { padding-left: 20px; } .row { grid-template-columns: 1fr; } h1 { font-size: 30px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">React India 2026 · Workshop guide</div>
+  <h1>Your component renders in React. <span>Soon it needs to render in ChatGPT.</span></h1>
+  <p class="sub">Everything you need, step by step. This page updates itself while you work.</p>
+  <div class="status" id="status"></div>
+</header>
+<main>
+  <div class="tip"><b>How each step works:</b> tell your coding agent the line in orange (copy button on the right). It reads the full prompt from <code>PROMPTS.md</code> itself, so you never paste prompts. When it's done, open the checkpoint links. Then ask it <i>“explain step N”</i> and read the answers.</div>
+  <div id="steps"></div>
+</main>
+<footer>
+  Behind? Don't debug, jump: stop <code>npm run dev</code> (Ctrl+C), run <code>npm run catchup N</code>, then <code>npm run dev</code>. Your work is backed up first. ·
+  Stuck? <code>npm run check</code> says what a host would reject. ·
+  <a href="https://github.com/hadarge/react-india-mcp-apps" target="_blank" rel="noopener">Repo</a> ·
+  <a href="https://github.com/hadarge/react-india-mcp-apps/blob/main/PROMPTS.md" target="_blank" rel="noopener">PROMPTS.md</a>
+</footer>
+<script>
+let S = { step: 0, playgroundPort: location.port || 5173, mcpPort: 3001, hostPort: 8080, mcp: false, host: false, tunnel: null };
+const play = (p = "") => `http://localhost:${S.playgroundPort}/${p}`;
+const host = (q = "") => `http://localhost:${S.hostPort}/${q}`;
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const cmd = (text, say) => `<div class="cmd${say ? " say" : ""}"><span>${esc(text)}</span><button class="copy" data-copy="${esc(text)}">Copy</button></div>`;
+const link = (href, label) => `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(label)}</a>`;
+
+const steps = () => [
+  { n: 0, title: "Run it", goal: "Install, check your machine, start everything.",
+    run: [cmd("npm run doctor"), cmd("npm run dev")],
+    check: `<div class="links">${link(play(), "Open the picker (:" + S.playgroundPort + ")")}</div><ul><li>The Sunset Shack picker shows.</li><li>Click a time: the event shows up in “Events out”.</li></ul>` },
+  { n: 1, title: "Pull the contract out of React", goal: "A framework-free mount / update / destroy contract, run by plain JS, React and Vue. No fork.",
+    say: "Read AGENTS.md, then do step 1",
+    check: `<div class="links">${link(play("vanilla.html"), "Vanilla page")}${link(play("react-host.html"), "React host")}${link(play("vue.html"), "Vue page")}</div><ul><li>Vanilla: click a slot → <code>select …</code> logs.</li><li>Press <b>destroy()</b>, then Esc → <b>nothing</b> logs. That's the leak test.</li><li>React host: change the party size; your selection survives.</li></ul>` },
+  { n: 2, title: "Serve it to an agent", goal: "One tool, one ui:// resource, and a view that mounts the contract inside an MCP host.",
+    say: "Read AGENTS.md, then do step 2",
+    run: [`<p class="small">Then <b>restart</b> <code>npm run dev</code> (Ctrl+C, run it again): the new <code>app/server</code> folder starts the MCP server and the local host.</p>`, cmd("npm run check")],
+    check: `<div class="links">${link(host("?server=sunset-shack&tool=find_table&call=true"), "Render it in the local host (:" + S.hostPort + ")")}</div><ul><li><code>npm run check</code> is all green.</li><li>The picker renders inside the host's sandboxed iframe. “Tool Result” shows what the model receives.</li></ul>` },
+  { n: 3, title: "Close the loop", goal: "Book from the card through app-only tools; the model learns about it through a tool it can call.",
+    say: "Read AGENTS.md, then do step 3", run: [cmd("npm run check")],
+    check: `<div class="links">${link(host("?server=sunset-shack&tool=find_table&call=true"), "Open the local host")}</div><ul><li>Pick a slot, type a name, Book: the card says <b>Table booked</b>.</li><li>The <b>Model Context</b> panel shows your booking line.</li><li><code>book_table</code> is <b>not</b> in the tool list (it's app-only).</li></ul>` },
+  { n: 4, title: "Survive real hosts", goal: "Summary to the model, payload to the view, CSP, versioned UI, host theme, height.",
+    say: "Read AGENTS.md, then do step 4", run: [cmd("npm run check")],
+    check: `<div class="links">${link(host("?server=sunset-shack&tool=find_table&call=true"), "Open the local host")}</div><ul><li><code>npm run check</code>: the model sees about <b>400 B</b>, not 8.5 KB.</li><li>The logo shows. Toggle the host's 🌙: the picker follows.</li><li><b>Break it on purpose:</b> set <code>resourceDomains: []</code>, reload. The logo dies, and DevTools shows the CSP error.</li></ul>` },
+  { n: 5, title: "Put it in a real chat", goal: "A tunnel, a connector, and your component inside Claude or ChatGPT. No account? The local host is the same protocol.",
+    run: [`<p class="small"><b>Terminal 1:</b> Ctrl+C, then</p>`, cmd("npm run catchup 5"), cmd("npm run dev"),
+      `<p class="small"><b>Terminal 2</b> (Windows / Linux: <code>npm run get-cloudflared</code> once first):</p>`, cmd("npm run tunnel"),
+      S.tunnel ? `<p class="small"><b>Your connector URL</b> (live from the tunnel):</p>${cmd(S.tunnel)}${cmd("npm run check -- " + S.tunnel)}` : `<p class="small">Your connector URL appears here as soon as the tunnel is up.</p>`],
+    check: `<ul><li><b>Claude:</b> Settings → Connectors → Add custom connector → name it <b>Sunset Shack</b> → paste the URL → no auth. In a <b>new chat</b>:</li></ul>${cmd("Use Sunset Shack to find me a table for 4 this Friday evening.", true)}<ul><li><b>ChatGPT:</b> chatgpt.com/plugins → + → Add custom MCP server → paste the URL, auth None (developer mode, plan-dependent). Mention it with @.</li><li>Then ask: <i>“What did I book?”</i> The model calls <code>get_booking</code>.</li></ul>` },
+];
+
+const render = () => {
+  const open = new Set([...document.querySelectorAll("details.step[open]")].map((d) => d.dataset.n));
+  // You're reading this page, so step 0 is done: the next step is the one after what app/ holds.
+  const current = Math.min(S.step + 1, 5);
+  document.getElementById("steps").innerHTML = steps().map((s) => {
+    const state = s.n < current ? "done" : s.n === current ? "current" : "";
+    const isOpen = open.size ? open.has(String(s.n)) || s.n === current : s.n === current;
+    return `<details class="step ${state}" data-n="${s.n}" ${isOpen ? "open" : ""}>
+      <summary><span class="num">${s.n < current ? "✓" : s.n}</span><span class="title">Step ${s.n} · ${s.title}</span><span class="tag">${state === "current" ? "you are here" : state === "done" ? "done" : ""}</span></summary>
+      <div class="body"><p class="goal">${s.goal}</p>
+        ${s.say ? `<div class="row"><div class="label">Tell your agent</div><div>${cmd(s.say, true)}</div></div>` : ""}
+        ${s.run ? `<div class="row"><div class="label">Run</div><div>${s.run.join("")}</div></div>` : ""}
+        <div class="row"><div class="label">Checkpoint</div><div>${s.check}</div></div>
+        ${s.n >= 1 ? `<div class="row"><div class="label">Then</div><div>${s.n < 5 ? cmd(`explain step ${s.n}`, true) : ""}<p class="small">Behind? Ctrl+C, <code>npm run catchup ${s.n}</code>, <code>npm run dev</code>.</p></div></div>` : ""}
+      </div></details>`;
+  }).join("");
+  const pill = (on, label, href) => `<${href ? `a href="${href}" target="_blank" rel="noopener"` : "span"} class="pill ${on ? "on" : ""}"><span class="dot"></span>${label}</${href ? "a" : "span"}>`;
+  document.getElementById("status").innerHTML = [
+    pill(true, `Your app/ looks like step ${S.step}`),
+    pill(true, `Playground :${S.playgroundPort}`, play()),
+    pill(S.mcp, `MCP server :${S.mcpPort}${S.mcp ? "" : " (from step 2)"}`),
+    pill(S.host, `Local host :${S.hostPort}${S.host ? "" : " (from step 2)"}`, S.host ? host() : ""),
+    pill(!!S.tunnel, S.tunnel ? "Tunnel up" : "No tunnel (step 5)"),
+  ].join("");
+};
+
+let last = "";
+const refresh = async () => {
+  try { const r = await fetch("/__guide/status", { cache: "no-store" }); if (r.ok) Object.assign(S, await r.json()); } catch {}
+  const now = JSON.stringify(S);
+  if (now !== last) { last = now; render(); } // re-render only on change, so open/closed steps stay as you left them
+};
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("button.copy"); if (!b) return;
+  try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; b.classList.add("ok"); setTimeout(() => { b.textContent = "Copy"; b.classList.remove("ok"); }, 1400); } catch {}
+});
+refresh(); setInterval(refresh, 3000);
+</script>
+</body>
+</html>

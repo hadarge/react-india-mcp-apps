@@ -12,7 +12,7 @@ The core path needs **no AI account and no API key**. A local MCP Apps host is i
 git clone <repo-url> react-india-mcp-apps && cd react-india-mcp-apps
 npm install
 npm run doctor
-npm run dev        # then open http://localhost:5173 (from step 2 on, also http://localhost:8080)
+npm run dev        # opens the workshop guide: http://localhost:5173/guide
 ```
 
 Requirements: Node **22 LTS** (22.12+; 20.19+ also works), a coding agent you are comfortable with (Claude Code, Cursor, Copilot, Codex…), and git (optional). No AI account or API key is needed for the core path. Optional, for the last step: `cloudflared` (macOS `brew install cloudflared`; Windows and Linux `npm run get-cloudflared`, which downloads Cloudflare's official binary into this folder with no admin rights) and a Claude or ChatGPT account that can add a custom connector.
