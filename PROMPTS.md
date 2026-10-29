@@ -7,6 +7,8 @@ Each step below has the same four parts:
 - **Checkpoint**: what you should see when the step is done.
 - **If it breaks**: the common failures and their fixes.
 
+**Explain it back.** Every step ends with three questions. When the step works, have your agent answer them in the chat, quoting the lines it wrote (`AGENTS.md` tells it to), then read the answers and push back. Knowing why a line is there is the part an agent can't do for you.
+
 Fell behind? Stop `npm run dev` (Ctrl+C), run `npm run catchup <n>`, then `npm run dev` again. Catchup replaces `app/` with the finished step and backs up your version first. It takes under a minute.
 
 Using your own component instead of the provided one? See the section "Bring your own component" at the end.
@@ -65,6 +67,11 @@ Goal: give this React component a framework-free contract so any host can run it
 
 **Finished early?** Run the "Bring your own component" prompt at the end of this file on a component from your day job.
 
+**Explain it back**
+1. Why does `destroy()` call `root.unmount()`, and how does the Esc test prove it ran?
+2. Why does the React host keep `events` in a ref and mount only once? What breaks if its effect depends on `events`?
+3. Which `TableBooker` props are data and which are events? Which of them could not arrive from a server as JSON?
+
 ---
 
 ## Step 2 · Serve it to an agent (16 min)
@@ -102,6 +109,11 @@ The view is built into ONE file at app/.dist/index.html by vite.view.config.ts (
 - *Agent imported `@modelcontextprotocol/sdk/server/mcp.js`:* that is the v1 API. Paste the prompt again.
 - *"Server is binding to 0.0.0.0 without DNS rebinding protection":* expected for a local workshop server. It binds to all interfaces so the tunnel in step 5 can reach it. In production you put auth in front.
 
+**Explain it back**
+1. What does `find_table` return in `content` and in `structuredContent`, and who reads each one?
+2. Why must `app.ontoolresult` be set before `app.connect()`? What does the user see if it isn't?
+3. What links the tool to the view? Point at the two lines that must match, and say why the view is one HTML file.
+
 ---
 
 ## Step 3 · Close the loop (14 min)
@@ -132,6 +144,11 @@ Run `npm run typecheck` and `npm run check`.
 - *Clicking Book does nothing in Claude/ChatGPT but worked in a plain preview:* plain previews have no bridge. Always test in a host (this one, the Inspector, or a real client).
 - *Double booking on a double click:* there is no idempotency key, or it is generated per click on the server side. Generate it in the view, once per intent.
 - *An extra argument "worked" but did nothing:* the schema is not `.strict()`. Zod strips unknown keys silently and returns 200.
+
+**Explain it back**
+1. Why is `book_table` app-only, and what does `visibility: ["app"]` *not* protect you from?
+2. Where is the idempotency key created, and what would break if the server created it instead?
+3. After the user books, how can the model find out? Compare `updateModelContext` with `get_booking`: which one can you rely on, and why?
 
 ---
 
@@ -164,6 +181,11 @@ Run `npm run typecheck` and `npm run check`.
 - *Widget grows taller and taller:* you send the height on every ResizeObserver tick, or `html, body` have `height: 100%`.
 - *Stuck on the skeleton:* `load_slots` is missing from the server, or it is model-only. The view can call only tools whose visibility includes `"app"`.
 
+**Explain it back**
+1. Why does `find_table` now return only a summary, and how does the view get the slots?
+2. Why does the view start its "no result" timer in `ontoolinput` instead of when it mounts?
+3. What does the CSP declaration allow, why is it declared under two keys, and what happens in a host when it's missing?
+
 ---
 
 ## Step 5 · Put it in a real chat (9 min)
@@ -193,6 +215,11 @@ Why `catchup 5`: step 5's server derives its public URL from each request, so th
 - *UI didn't change after you edited code:* hosts cache the resource. Bump the `ui://` URI and reconnect.
 - *"Use caution" banner when the view sends a message:* that is Claude staging `ui/message` for the user to confirm. It is expected; it is why we used a tool plus model context instead.
 - *Tunnel URL changed:* quick tunnels get a new URL every restart. Edit the connector URL.
+
+**Explain it back**
+1. Why does step 5's server build its public URL from each request instead of using a constant?
+2. Why can't Claude or ChatGPT connect to `localhost:3001` directly?
+3. After you book, ask "what did I book?". Which tool did the model call, and why didn't it already know?
 
 ---
 

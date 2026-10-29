@@ -40,7 +40,7 @@ Requirements: Node **22 LTS** (22.12+; 20.19+ also works), a coding agent you ar
 | 4 | Host-proof: summary to the model, data pulled by the view, CSP under both keys, host theme, mount ≠ call, explicit height | `steps/step-4` |
 | 5 | Real hosts: tunnel, public URL derived per request, Claude / ChatGPT | `steps/step-5` |
 
-The prompts, checkpoints and fixes for every step are in **[PROMPTS.md](PROMPTS.md)**.
+The prompts, checkpoints and fixes for every step are in **[PROMPTS.md](PROMPTS.md)**. Each step ends with three **Explain it back** questions: when the step works, your agent answers them in the chat, quoting the code it wrote, and you check the answers. [AGENTS.md](AGENTS.md) gives your agent the workshop's rules (work only in `app/`, don't copy from `steps/`, check, explain); Cursor, Copilot, Codex and others read it directly, and Claude Code reads it through `CLAUDE.md`.
 
 Fell behind? `npm run catchup 3` makes `app/` equal to step 3 (it backs up yours first). You can also run any finished step without touching your work: `npm run dev -- --step 3`. If the repo was published with step branches (`scripts/make-branches.mjs`), `git checkout step-3` works too.
 
