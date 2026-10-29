@@ -4,6 +4,7 @@
 // The URL changes on every restart: re-add the connector (or edit its URL) each time.
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 // Follows `npm run dev -- --port N` (dev writes .dev-port); PORT env or --port override it.
 const portArg = process.argv.indexOf("--port");
@@ -14,18 +15,25 @@ const win = process.platform === "win32";
 const has = (cmd) => spawnSync(cmd, ["--version"], { stdio: "ignore", shell: win }).status === 0;
 
 let cmd, args;
-if (!has("cloudflared") && win && process.arch === "arm64") {
-  // The cloudflared npm package has no Windows-on-ARM build. The official x64 one runs under emulation.
-  console.error("cloudflared isn't installed, and `npx cloudflared` has no Windows ARM build.\n" +
-    "Install it once:  winget install --id Cloudflare.cloudflared   (then open a new terminal)\n" +
-    `Or use ngrok:     ngrok http ${port}   and add <https-url>/mcp as the connector.`);
+// Prefer a cloudflared on PATH, then the one `npm run get-cloudflared` put in .tools/ (no admin needed).
+const local = new URL(`../.tools/${win ? "cloudflared.exe" : "cloudflared"}`, import.meta.url);
+if (!has("cloudflared") && existsSync(local)) [cmd, args] = [fileURLToPath(local), ["tunnel", "--no-autoupdate", "--url", `http://localhost:${port}`]];
+else if (!has("cloudflared") && win) {
+  // `npx cloudflared` is unreliable on Windows (slow silent download; its binary didn't start on Windows ARM in testing).
+  console.error("cloudflared isn't installed. Get it once, then run `npm run tunnel` again:\n" +
+    "  npm run get-cloudflared      (downloads Cloudflare's official .exe into this folder, no admin rights)\n" +
+    "  or: winget install --id Cloudflare.cloudflared   (needs admin; open a new terminal after)\n" +
+    `Or use ngrok: ngrok http ${port}, then add <https-url>/mcp as the connector.`);
   process.exit(1);
 }
-if (has("cloudflared")) [cmd, args] = ["cloudflared", ["tunnel", "--no-autoupdate", "--url", `http://localhost:${port}`]];
-else [cmd, args] = [win ? "npx.cmd" : "npx", ["-y", "cloudflared@0.7.1", "tunnel", "--no-autoupdate", "--url", `http://localhost:${port}`]];
+else if (has("cloudflared")) [cmd, args] = ["cloudflared", ["tunnel", "--no-autoupdate", "--url", `http://localhost:${port}`]];
+else {
+  console.log("cloudflared not found; `npx cloudflared` downloads it on first run (about 40 MB, give it a minute).");
+  [cmd, args] = ["npx", ["-y", "cloudflared@0.7.1", "tunnel", "--no-autoupdate", "--url", `http://localhost:${port}`]];
+}
 
 console.log(`Starting a Cloudflare quick tunnel to localhost:${port} ...`);
-const child = spawn(cmd, args, { stdio: ["ignore", "pipe", "pipe"], shell: win });
+const child = spawn(cmd, args, { stdio: ["ignore", "pipe", "pipe"] }); // no shell: paths may contain spaces
 let shown = false;
 const scan = (d) => {
   const m = String(d).match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/);

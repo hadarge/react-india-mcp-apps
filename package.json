@@ -15,6 +15,7 @@
     "build:host": "node scripts/build-host.mjs",
     "host": "tsx host/serve.ts",
     "tunnel": "node scripts/tunnel.mjs",
+    "get-cloudflared": "node scripts/get-cloudflared.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:e2e": "node scripts/e2e-all.mjs"
   },

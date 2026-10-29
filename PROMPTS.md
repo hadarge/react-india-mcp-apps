@@ -175,6 +175,7 @@ Run `npm run typecheck` and `npm run check`.
 npm run catchup 5
 npm run dev          # keeps the port you used before (e.g. 3011)
 # terminal 2 (skip if your tunnel from 2:55 is still running: it follows the same port)
+npm run get-cloudflared   # once, Windows/Linux without cloudflared (no admin rights)
 npm run tunnel       # → prints https://<random>.trycloudflare.com/mcp
 npm run check -- https://<random>.trycloudflare.com/mcp
 ```

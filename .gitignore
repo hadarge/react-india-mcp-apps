@@ -8,4 +8,5 @@ node_modules/
 *.log
 .npm-cache/
 .dev-port
+.tools/
 host/dist/

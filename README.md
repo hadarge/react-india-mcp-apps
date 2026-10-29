@@ -15,7 +15,7 @@ npm run doctor
 npm run dev        # then open http://localhost:5173 (from step 2 on, also http://localhost:8080)
 ```
 
-Requirements: Node **22 LTS** (22.12+; 20.19+ also works), a coding agent you are comfortable with (Claude Code, Cursor, Copilot, Codex…), and git (optional). No AI account or API key is needed for the core path. Optional, for the last step: `cloudflared` (macOS `brew install cloudflared`, Windows `winget install --id Cloudflare.cloudflared`) and a Claude or ChatGPT account that can add a custom connector.
+Requirements: Node **22 LTS** (22.12+; 20.19+ also works), a coding agent you are comfortable with (Claude Code, Cursor, Copilot, Codex…), and git (optional). No AI account or API key is needed for the core path. Optional, for the last step: `cloudflared` (macOS `brew install cloudflared`; Windows and Linux `npm run get-cloudflared`, which downloads Cloudflare's official binary into this folder with no admin rights) and a Claude or ChatGPT account that can add a custom connector.
 
 **Windows:** everything works in PowerShell. Use `npm run dev -- --port 3011` (not `PORT=…`) if a port is busy, run `npm run catchup N` and `npm run dev` as two separate commands, and always stop `npm run dev` (Ctrl+C) before `catchup`.
 
@@ -74,6 +74,7 @@ ext-apps 2.x is built on the **v2 split SDK packages**, not `@modelcontextprotoc
 | `npm run check [-- <url>]` | headless host: lists tools, reads the resource, calls tools, checks idempotency and strict schemas |
 | `npm run catchup <N>` | replace `app/` with step N (backs yours up to `.backups/`) |
 | `npm run tunnel` | Cloudflare quick tunnel to your dev port (default 3001) and prints your connector URL |
+| `npm run get-cloudflared` | Windows/Linux: downloads the official `cloudflared` into `.tools/` (no admin). `tunnel` uses it |
 | `npm run test:e2e` | typecheck, build and check every step from scratch |
 | `npm run typecheck` | `tsc --noEmit` over `app/` and the host |
 

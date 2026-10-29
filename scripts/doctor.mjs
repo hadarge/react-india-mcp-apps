@@ -19,13 +19,15 @@ const [maj, min] = process.versions.node.split(".").map(Number);
 if (maj > 22 || (maj === 22 && min >= 12) || (maj === 20 && min >= 19)) ok(`Node ${process.versions.node}`);
 else bad(`Node ${process.versions.node} is too old`, "install Node 22 LTS (https://nodejs.org) or `nvm install 22`");
 
-for (const dep of ["@modelcontextprotocol/ext-apps", "@modelcontextprotocol/server", "vite", "react", "tsx"]) {
-  if (!existsSync(path.join(root, "node_modules", dep, "package.json"))) {
-    bad(`missing dependency ${dep}`, "run `npm install` (no internet? copy the repo from the USB stick, then `npm ci --offline --cache ./.npm-cache`)");
-    break;
-  }
-}
-if (existsSync(path.join(root, "node_modules", "@modelcontextprotocol/ext-apps"))) ok("dependencies installed");
+const deps = ["@modelcontextprotocol/ext-apps", "@modelcontextprotocol/server", "@modelcontextprotocol/client", "vite", "react", "react-dom", "vue", "tsx", "zod", "express"];
+const missing = deps.filter((dep) => !existsSync(path.join(root, "node_modules", dep, "package.json")));
+if (missing.length) bad(`missing dependencies: ${missing.join(", ")}`, "run `npm install` (no internet? copy the repo from the USB stick, then `npm ci --offline --cache ./.npm-cache`)");
+else ok("dependencies installed");
+
+// A custom npm registry (corporate mirror, an old local mirror in ~/.npmrc) is the most common reason installs fail.
+const registry = (spawnSync("npm", ["config", "get", "registry"], { encoding: "utf8", shell: process.platform === "win32" }).stdout ?? "").trim();
+if (registry && !/^https:\/\/registry\.npmjs\.org\/?$/.test(registry))
+  warn(`npm registry is ${registry}. If installs fail, run: npm install --registry=https://registry.npmjs.org/`);
 
 if (existsSync(path.join(root, "host", "dist", "index.html")) && existsSync(path.join(root, "host", "dist", "sandbox.html"))) ok("local MCP Apps host is built");
 else warn("local host not built yet; `npm run dev` builds it on first run (~10 s)");
@@ -65,7 +67,8 @@ for (const [port, what] of [[5173, "playground"], [mcpPort, "MCP server"], [8080
 
 const has = (cmd) => spawnSync(cmd, ["--version"], { stdio: "ignore", shell: process.platform === "win32" }).status === 0;
 if (has("cloudflared")) ok("cloudflared found (for connecting Claude / ChatGPT)");
-else warn(`cloudflared not installed: optional, only for the real-host step (${process.platform === "win32" ? "`winget install --id Cloudflare.cloudflared`" : "`brew install cloudflared`"}${process.platform === "win32" && process.arch === "arm64" ? "" : ", or `npx cloudflared` downloads it"})`);
+else if (existsSync(path.join(root, ".tools", process.platform === "win32" ? "cloudflared.exe" : "cloudflared"))) ok("cloudflared found in .tools/ (for connecting Claude / ChatGPT)");
+else warn(`cloudflared not installed: optional, only for the real-host step (${process.platform === "darwin" ? "`brew install cloudflared`" : "`npm run get-cloudflared`, no admin rights"})`);
 if (has("git")) ok("git found");
 else warn("git not found: use `npm run catchup <n>` to jump between steps");
 
