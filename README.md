@@ -17,7 +17,7 @@ npm run dev        # then open http://localhost:5173 (from step 2 on, also http:
 
 Requirements: Node **22 LTS** (22.12+; 20.19+ also works), a coding agent you are comfortable with (Claude Code, Cursor, Copilot, Codex…), and git (optional). No AI account or API key is needed for the core path. Optional, for the last step: `cloudflared` (macOS `brew install cloudflared`; Windows and Linux `npm run get-cloudflared`, which downloads Cloudflare's official binary into this folder with no admin rights) and a Claude or ChatGPT account that can add a custom connector.
 
-**Windows:** everything works in PowerShell. Use `npm run dev -- --port 3011` (not `PORT=…`) if a port is busy, run `npm run catchup N` and `npm run dev` as two separate commands, and always stop `npm run dev` (Ctrl+C) before `catchup`.
+**Windows:** everything works in PowerShell. Use `npm run dev -- --port 3011` (not `PORT=…`) if a non-Node program holds port 3001 (`npm run dev` stops leftover Node servers on its ports by itself), run `npm run catchup N` and `npm run dev` as two separate commands, and always stop `npm run dev` (Ctrl+C) before `catchup`.
 
 ## What runs
 

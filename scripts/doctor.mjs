@@ -4,6 +4,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import net from "node:net";
 import path from "node:path";
+import { holders } from "./ports.mjs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -61,7 +62,9 @@ const mcpPort = Number(process.env.PORT ?? (existsSync(devPortFile) ? readFileSy
 for (const [port, what] of [[5173, "playground"], [mcpPort, "MCP server"], [8080, "local host"], [8081, "host sandbox"]]) {
   if (await portFree(port)) ok(`port ${port} free (${what})`);
   else {
-    bad(`port ${port} is busy (${whoHolds(port)})`, port === mcpPort ? "stop it, or run `npm run dev -- --port 3011` (the host, check and tunnel follow)" : `stop the process using ${port}`);
+    const held = holders(port);
+    if (held.length && held.every((h) => /^node(\.exe)?$/i.test(h.name))) warn(`port ${port} is held by Node (pid ${held.map((h) => h.pid).join(", ")}); \`npm run dev\` stops it for you`);
+    else bad(`port ${port} is busy (${whoHolds(port)})`, port === mcpPort ? "stop it, or run `npm run dev -- --port 3011` (the host, check and tunnel follow)" : `stop the process using ${port}`);
   }
 }
 

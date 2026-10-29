@@ -13,6 +13,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildHost } from "./build-host.mjs";
+import { freePorts } from "./ports.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -51,7 +52,14 @@ const run = (name, cmd, cmdArgs) => {
   };
   pipe(child.stdout, process.stdout);
   pipe(child.stderr, process.stderr);
-  child.on("exit", (code) => code && console.error(`${tag}exited with code ${code}`));
+  child.on("exit", (code) => {
+    if (code) console.error(`${tag}exited with code ${code}`);
+    // One part stopped (e.g. a newer \`npm run dev\` took the ports): stop the rest too, don't linger.
+    if (!stopping) {
+      console.error(`${tag}stopped; shutting down this dev run. Start it again with \`npm run dev\`.`);
+      stop();
+    }
+  });
   children.push(child);
 };
 
@@ -60,6 +68,15 @@ const hasView = existsSync(path.join(appDir, "view"));
 const hasServer = existsSync(path.join(appDir, "server", "main.ts"));
 
 console.log(`\n  Running \x1b[1m${rel}\x1b[0m\n`);
+
+// Free our ports first. A Node process on them is a dev server from another terminal, or another
+// workshop's `npm start`: stop it. Anything else is left alone, with a way around it.
+const ports = [[Number(process.env.PLAYGROUND_PORT ?? 5173), "the playground"]];
+if (hasServer) ports.push([Number(PORT), "the MCP server"], [Number(process.env.HOST_PORT ?? 8080), "the local host"], [8081, "the host sandbox"]);
+for (const [port, what, left] of await freePorts(ports)) {
+  const hint = port === Number(PORT) ? `run \`npm run dev -- --port ${Number(PORT) + 10}\`` : "close that program first";
+  console.error(`  Port ${port} (${what}) is held by ${left.map((h) => `${h.name} pid ${h.pid}`).join(", ")}: ${hint}.`);
+}
 console.log(`  Playground   http://localhost:${process.env.PLAYGROUND_PORT ?? 5173}        (React, vanilla, Vue consumers)`);
 if (hasServer) {
   console.log(`  MCP server   http://localhost:${PORT}/mcp`);
@@ -75,7 +92,9 @@ if (hasServer) {
   run("host", bin("tsx", "dist/cli.mjs"), ["host/serve.ts"]);
 }
 
+let stopping = false;
 const stop = () => {
+  stopping = true;
   for (const c of children) {
     // Windows has no process groups: kill the whole tree, or tsx's server child keeps holding the port.
     if (process.platform === "win32") spawnSync("taskkill", ["/pid", String(c.pid), "/T", "/F"], { stdio: "ignore" });

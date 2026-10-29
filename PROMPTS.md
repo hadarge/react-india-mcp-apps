@@ -27,7 +27,7 @@ npm run dev
 **Checkpoint:** http://localhost:5173 shows the Sunset Shack picker inside a normal React page. When you click a time, the event appears in the "Events out" panel.
 
 **If it breaks**
-- `port … is busy`: something else is running. Stop it, or run `npm run dev -- --port 3011`. The port sticks: later `npm run dev`, `check` and `tunnel` reuse it (`--port 3001` switches back).
+- Ports: `npm run dev` stops any Node server already on its ports (a dev run in another terminal, another workshop's `npm start`) and says so. If a non-Node program holds one, it names it: close it, or run `npm run dev -- --port 3011`. The port sticks: later `npm run dev`, `check` and `tunnel` reuse it (`--port 3001` switches back).
 - `npm install` is crawling on the venue wifi: copy the repo folder from the facilitator's USB stick (it includes an npm cache), then run `npm ci --offline --cache ./.npm-cache` inside it. Windows (PowerShell): `robocopy E:\react-india-mcp-apps $HOME\react-india-mcp-apps /E` (your stick's drive letter), `cd $HOME\react-india-mcp-apps`, then the same `npm ci` line.
 
 ---
