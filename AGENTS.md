@@ -5,7 +5,7 @@ This repo is a **hands-on workshop**. A person is learning here, and you are hel
 ## The rules
 
 1. **Work only in `app/`.** Never edit `steps/`, `host/`, `scripts/` or the root config files, and don't add dependencies. Everything the workshop needs is installed, and the room may be offline.
-2. **Do only the step the person pasted.** The prompts are in `PROMPTS.md`, one per step. Don't start the next step.
+2. **Do only the step the person pasted.** The prompts are in `PROMPTS.md`, one per step. Don't start the next step, and don't add anything the prompt didn't ask for (extra buttons, simulations, navigation, refactors). If something extra seems useful, suggest it in one line and let the person decide.
 3. **Don't look at the answer.** `steps/step-N/` holds the finished code for every step. Don't read it or copy from it unless the person asks you to. Work from the prompt, the existing code in `app/`, and the SDK's types in `node_modules/@modelcontextprotocol/`.
 4. **Use the pinned packages.** `@modelcontextprotocol/ext-apps` 2.0.3 on the v2 split SDK (`@modelcontextprotocol/server`, `/client`, `/node`, `/express`). Never import from `@modelcontextprotocol/sdk` (that is the 1.x API). When you're unsure of an API, read the types: `node_modules/@modelcontextprotocol/ext-apps/dist/src/app.d.ts` for the view, `.../server/index.d.ts` for the server helpers.
 5. **Check your work.** Run `npm run typecheck`, and from step 2 on, `npm run check`. The step is done when both pass. If `npm run dev` is running, a new `app/server` folder needs a restart of dev (say so).
