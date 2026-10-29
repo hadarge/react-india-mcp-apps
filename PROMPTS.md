@@ -3,7 +3,7 @@
 Each step below has the same four parts:
 
 - **Goal**: what you are building in this step.
-- **Prompt**: paste it into your coding agent (Claude Code, Cursor, Copilot, Codex, and so on).
+- **Prompt**: what your agent will do. **Don't paste it.** Tell your agent (Claude Code, Cursor, Copilot, Codex, and so on): **`Read AGENTS.md, then do step 1`** (2, 3…). `AGENTS.md` tells it to read the prompt from this file, follow it exactly, run the checks and explain back. Pasting by hand is only the fallback.
 - **Checkpoint**: what you should see when the step is done.
 - **If it breaks**: the common failures and their fixes.
 
@@ -13,7 +13,7 @@ Fell behind? Stop `npm run dev` (Ctrl+C), run `npm run catchup <n>`, then `npm r
 
 Using your own component instead of the provided one? See the section "Bring your own component" at the end.
 
-> Why the prompts name exact imports: agents were trained mostly on the 2025 APIs (`@modelcontextprotocol/sdk` 1.x, `ext-apps` 0.x/1.x, `window.openai`). This repo pins **ext-apps 2.0.3 on the v2 SDK packages**. When the agent "fixes" an import back to `@modelcontextprotocol/sdk/...`, it is wrong. Paste the prompt again.
+> Why the prompts name exact imports: agents were trained mostly on the 2025 APIs (`@modelcontextprotocol/sdk` 1.x, `ext-apps` 0.x/1.x, `window.openai`). This repo pins **ext-apps 2.0.3 on the v2 SDK packages**. When the agent "fixes" an import back to `@modelcontextprotocol/sdk/...`, it is wrong. Tell it: "Read AGENTS.md, then do step N again."
 
 ---
 
@@ -94,7 +94,7 @@ Turn this repo into an MCP App server. Use EXACTLY these packages (already insta
    - The description tells the model WHEN to use it, and that the user picks the slot in the UI.
    - The handler returns { content: [{ type: "text", text: <one-line summary> }], structuredContent: { venue, slots, partySize, currency: "INR" } } using app/data/sunset-shack.ts.
    - registerAppResource(server, "Sunset Shack table picker", VIEW_URI, { mimeType: RESOURCE_MIME_TYPE }, async () => ({ contents: [{ uri: VIEW_URI, mimeType: RESOURCE_MIME_TYPE, text: <contents of app/.dist/index.html> }] }))
-3. app/view/index.html + app/view/view.ts: mount tableBooker (from app/contract) into #root with { loading: true }. Create `new App({ name: "sunset-shack-view", version: "1.0.0" })`. Set app.ontoolresult BEFORE calling app.connect(); on a result, widget.update({ ...result.structuredContent, loading: false }).
+3. app/view/index.html + app/view/view.ts: mount tableBooker (from app/contract) into #root with { venue: { id: "", name: "", area: "", cuisine: "" }, slots: [], loading: true } (the component maps over slots before it checks loading). Create `new App({ name: "sunset-shack-view", version: "1.0.0" })`. Set app.ontoolresult BEFORE calling app.connect(); on a result, widget.update({ ...result.structuredContent, loading: false }).
 The view is built into ONE file at app/.dist/index.html by vite.view.config.ts (already configured) and `npm run dev` already watches it. Run `npm run typecheck` and `npm run check`.
 ```
 
@@ -106,7 +106,7 @@ The view is built into ONE file at app/.dist/index.html by vite.view.config.ts (
 - *Blank card, no errors:* `app.connect()` was never called, or the handlers were attached after it. The handshake (`ui/initialize`) never happened.
 - *"Connecting…" forever in the host:* is the MCP server running on 3001? Run `npm run check`.
 - *Host shows the tool but no UI:* the `resourceUri` on the tool and the URI in `registerAppResource` differ by one character. Or the mimeType is not `RESOURCE_MIME_TYPE`.
-- *Agent imported `@modelcontextprotocol/sdk/server/mcp.js`:* that is the v1 API. Paste the prompt again.
+- *Agent imported `@modelcontextprotocol/sdk/server/mcp.js`:* that is the v1 API. Tell it: "Read AGENTS.md, then do step 2 again."
 - *"Server is binding to 0.0.0.0 without DNS rebinding protection":* expected for a local workshop server. It binds to all interfaces so the tunnel in step 5 can reach it. In production you put auth in front.
 
 **Explain it back**
@@ -225,7 +225,7 @@ Why `catchup 5`: step 5's server derives its public URL from each request, so th
 
 ## Bring your own component
 
-Copy your component (and its types) into `app/component/`, put realistic sample data in `app/data/`, then use these prompts in place of the Step 1 to Step 4 prompts:
+Copy your component (and its types) into `app/component/`, put realistic sample data in `app/data/`, then tell your agent "Read AGENTS.md, then do step 1 with my component" (and so on). It uses these prompts in place of the Step 1 to Step 4 prompts:
 
 ```text
 Read app/component/<YourComponent>.tsx. Do not modify it. Create a framework-free contract for it exactly like app/contract/widget.ts describes (mount/update/destroy + events), implement it in app/contract/<your-component>.widget.tsx with react-dom/client, and add app/playground/vanilla.html that mounts it with data from app/data/ and logs every event. Split its props into DATA (serializable, can come from a server) and EVENTS (callbacks). List any props that are not serializable (functions other than events, refs, React nodes, class instances): those must be redesigned before it can run in a chat.
