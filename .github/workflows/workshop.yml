@@ -1,0 +1,26 @@
+name: workshop
+on: [push, workflow_dispatch]
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        node: [20.19.0, 22]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ matrix.node }}" }
+      - run: npm ci
+      - run: npm run doctor
+      - run: npm run test:e2e
+      - name: catchup works
+        run: |
+          npm run catchup 3
+          node -e "require('fs').accessSync('app/server/bookings.ts')"
+      - name: get-cloudflared (Windows/Linux)
+        if: runner.os != 'macOS'
+        run: |
+          npm run get-cloudflared
+          node -e "const p=require('path').join('.tools', process.platform==='win32'?'cloudflared.exe':'cloudflared'); console.log(require('child_process').execFileSync(p,['--version']).toString())"
