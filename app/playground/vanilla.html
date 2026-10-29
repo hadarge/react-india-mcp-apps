@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sunset Shack · vanilla host</title>
+    <link rel="stylesheet" href="./shell.css" />
+  </head>
+  <body>
+    <div class="page">
+      <main>
+        <nav class="pages"><a href="./index.html">React app</a><a href="./vanilla.html">Vanilla host</a><a href="./react-host.html">React host via contract</a><a href="./vue.html">Vue host</a></nav>
+        <span class="badge">consumer · vanilla JS, no framework</span>
+        <h1>Same component, no React app</h1>
+        <p class="lede">This page has no React tree. It only knows <code>mount / update / destroy</code> and events.</p>
+        <div class="toolbar">
+          <button id="party4">update({ partySize: 4 })</button>
+          <button id="confirmed">update({ reservation })</button>
+          <button id="loading">update({ loading: true })</button>
+          <button id="destroy">destroy()</button>
+          <button id="remount">mount() again</button>
+        </div>
+        <div id="widget"></div>
+      </main>
+      <aside class="log" id="log"><h3>Events out</h3></aside>
+    </div>
+    <script type="module" src="./vanilla.ts"></script>
+  </body>
+</html>
