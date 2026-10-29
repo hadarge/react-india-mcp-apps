@@ -77,10 +77,10 @@ Goal: give this React component a framework-free contract so any host can run it
 Turn this repo into an MCP App server. Use EXACTLY these packages (already installed, do not add others, do not use @modelcontextprotocol/sdk):
 - @modelcontextprotocol/ext-apps 2.0.3: `import { App } from "@modelcontextprotocol/ext-apps"` (view), `import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server"` (server)
 - @modelcontextprotocol/server 2.x: `import { McpServer } from "@modelcontextprotocol/server"`
-- @modelcontextprotocol/express + @modelcontextprotocol/node for HTTP: createMcpExpressApp, NodeStreamableHTTPServerTransport
+- @modelcontextprotocol/express + @modelcontextprotocol/node for HTTP: `import { createMcpExpressApp } from "@modelcontextprotocol/express"`, `import { toNodeHandler } from "@modelcontextprotocol/node"`, and `import { createMcpHandler } from "@modelcontextprotocol/server"`
 - zod 4
 
-1. app/server/main.ts: an Express app from createMcpExpressApp({ host: "0.0.0.0" }) with cors(). Handle app.all("/mcp") STATELESSLY: create a new McpServer and a new NodeStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true }) per request, and close both on res "close". Listen on process.env.PORT ?? 3001 and log "listening".
+1. app/server/main.ts: an Express app from createMcpExpressApp({ host: "0.0.0.0" }) with cors(). Serve app.all("/mcp") with `toNodeHandler(createMcpHandler(() => createServer()))`, called as `(req, res) => mcp(req, res, req.body)`. createMcpHandler builds a fresh McpServer per request and answers both protocol eras (2026-07-28 `server/discover`, and the 2025 `initialize` handshake). Listen on process.env.PORT ?? 3001 and log "listening".
 2. app/server/server.ts exporting createServer():
    - const VIEW_URI = "ui://sunset-shack/table-booker.html"
    - registerAppTool(server, "find_table", { title, description, inputSchema: z.object({ partySize: z.number().int().min(1).max(12).default(2), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }).strict(), annotations: { readOnlyHint: true }, _meta: { ui: { resourceUri: VIEW_URI } } }, handler)
